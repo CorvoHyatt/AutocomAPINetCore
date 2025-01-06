@@ -1,0 +1,34 @@
+version: "3.9"
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "YourStrongPassword123!"
+    ports:
+      - "1433:1433"
+    networks:
+      - appnetwork
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: AutocomApiNetCore
+    ports:
+      - "9001:80"
+    environment:
+       ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=Autocom;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True"
+    depends_on:
+      - sqlserver
+    networks:
+      - appnetwork
+
+networks:
+  appnetwork:
+
+volumes:
+  sql_data:
